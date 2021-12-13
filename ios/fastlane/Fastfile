@@ -1,0 +1,102 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Description of what the lane does"
+  
+  lane :release do
+
+    api_key = app_store_connect_api_key(
+      key_id: "Z8TY9L9ZLL",
+      issuer_id: "69a6de74-ebd2-47e3-e053-5b8c7c11a4d1",
+      key_filepath: "./fastlane/AuthKey_Z8TY9L9ZLL.p8",
+      duration: 1200, # optional (maximum 1200)
+      in_house: false # optional but may be required if using match/sigh
+    )
+     
+    disable_automatic_code_signing 
+
+    increment_build_number
+    
+    # sync_code_signing(type: "appstore")
+    build_app(
+      scheme: "AwesomeProject", 
+      workspace: "AwesomeProject.xcworkspace",
+      # export_method: "app-store",
+      # export_options: {
+      #   provisioningProfiles: { 
+      #     "com.ihealthlabs.sharecare" => "appstorefastlanecomihealthlabssharecare",
+      #     "com.ihealthlabs.sharecare.ShareScreenExtension" => "fcomihealthlabssharecareShareScreenExtension"
+      #   }
+      # }
+    )
+     
+    # enable_automatic_code_signing 
+    
+    # upload_to_testflight
+
+    pilot(api_key: api_key)
+    
+  end
+
+  lane :submit do 
+    api_key = app_store_connect_api_key(
+      key_id: "CX3FVBW4PM",
+      issuer_id: "32219c6d-ac33-45f0-a4ba-1285dcdd7ec4",
+      key_filepath: "./fastlane/AuthKey_CX3FVBW4PM.p8",
+      duration: 1200, # optional (maximum 1200)
+      in_house: false # optional but may be required if using match/sigh
+    )
+
+    upload_to_app_store(
+      force: true,
+      precheck_include_in_app_purchases: false
+    )
+
+    deliver(
+      api_key: api_key,
+      precheck_include_in_app_purchases: false,
+      precheck_default_rule_level: false,
+      # build_number: latest_testflight_build_number,
+      submit_for_review: true,
+      release_notes: {"en-US": "Minor bugfixes. Perfomance fixes."},
+      force: true, # Skip HTMl report verification
+      skip_screenshots: true,
+      skip_binary_upload: true,
+      submission_information: {
+        add_id_info_limits_tracking: true,
+        add_id_info_serves_ads: false,
+        add_id_info_tracks_action: true,
+        add_id_info_tracks_install: true,
+        add_id_info_uses_idfa: true,
+        content_rights_has_rights: true,
+        content_rights_contains_third_party_content: true,
+        export_compliance_platform: 'ios',
+        export_compliance_compliance_required: false,
+        export_compliance_encryption_updated: false,
+        export_compliance_app_type: nil,
+        export_compliance_uses_encryption: false,
+        export_compliance_is_exempt: false,
+        export_compliance_contains_third_party_cryptography: false,
+        export_compliance_contains_proprietary_cryptography: false,
+        export_compliance_available_on_french_store: false
+      }
+    )
+  end
+ 
+  
+end
