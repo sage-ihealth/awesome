@@ -9,6 +9,10 @@ local pipelineiOS(branch, instance) = {
         {
             name: "fastlane-iOS",
             commands: [
+                'pwd',
+                'source ~/.bash_profile',
+                ' /usr/bin/which node',
+                'export HOME=/Users/sagegu; cd /Users/sagegu/Documents/GitHub/sage/AwesomeProject',
                // 'export HOME=/Users/iHealth; cd /Users/iHealth/Documents/GitHub/ShareCareMobile-iOS;',
                 './scripts/ios.sh test'
             ],
