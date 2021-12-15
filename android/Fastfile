@@ -1,0 +1,79 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  desc "Runs all the tests"
+  lane :clean do
+    gradle(
+      task: "clean"
+    )
+  end
+
+  desc "Submit a new Beta Build to Crashlytics Beta"
+  lane :beta do
+   
+    store_password = prompt(text: "Signing Store Password: ", secure_text: true)
+    key_password = prompt(text: "Alias Key Password: ", secure_text: true)
+    releaseFilePath = File.join(Dir.pwd, "..", "my-release-key.keystore")
+    gradle(task: 'clean')
+  
+    # sh "your_script.sh"
+    # You can also use other beta testing services here
+  end
+
+  lane :release do
+    releaseFilePath = File.join(Dir.pwd, "../../../ShareCareMobileKey", "sharecare-upload.keystore")
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      print_command: true,
+      properties: {
+        "android.injected.signing.store.file" => releaseFilePath,
+        "android.injected.signing.store.password" => "iHealth99",
+        "android.injected.signing.key.alias" => "sharecare-upload",
+        "android.injected.signing.key.password" => "iHealth99",
+      }
+    )
+
+    aabFilePath = File.join(Dir.pwd, "../app/build/outputs/bundle/release/", "app-release.aab")
+    upload_to_play_store_internal_app_sharing(
+      aab: aabFilePath
+    )
+
+    # upload_to_play_store(
+    #   track: 'internal',
+    #   skip_upload_metadata: true,
+    #   skip_upload_images: true,
+    #   skip_upload_screenshots: true
+    # )
+    
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :internal do
+    aabFilePath = File.join(Dir.pwd, "../app/build/outputs/bundle/release/", "app-release.aab")
+    upload_to_play_store_internal_app_sharing(
+      aab: aabFilePath
+    )
+  end
+
+  desc "Deploy a new version to the Google Play"
+  lane :deploy do
+    gradle(task: "clean assembleRelease")
+    upload_to_play_store
+  end
+end
