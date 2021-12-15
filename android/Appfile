@@ -1,0 +1,3 @@
+
+json_key_file("fastlane/UnifiedCareAuto-play-store-credentials.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("com.ihealthlabs.sharecare") # e.g. com.krausefx.app
